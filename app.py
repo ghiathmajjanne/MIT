@@ -19,7 +19,7 @@ SAMPLE_RATE = 48000
 
 class FrequencyDetector(object):
 
-    FREQUENCY_RANGE = (70, 2000)
+    FREQUENCY_RANGE = (70, 1200)
 
     def __init__(self, window_size, segments_buf=None):
         self._window_size = window_size
@@ -172,9 +172,9 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/static/NoteDetectionProcessor.js", methods=['GET'])
+@app.route("/static/AudioStreamProcessor.js", methods=['GET'])
 def static_dir():
-    response = send_from_directory("static", "NoteDetectionProcessor.js")
+    response = send_from_directory("static", "AudioStreamProcessor.js")
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 

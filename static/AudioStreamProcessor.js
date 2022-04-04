@@ -1,4 +1,4 @@
-class NoteDetectionProcessor extends AudioWorkletProcessor {
+class AudioStreamProcessor extends AudioWorkletProcessor {
     static get parameterDescriptors() {
         return [{
             name: 'my processor',
@@ -64,4 +64,4 @@ class NoteDetectionProcessor extends AudioWorkletProcessor {
 
 }
 
-registerProcessor('NoteDetector', NoteDetectionProcessor);
+registerProcessor('AudioStream', AudioStreamProcessor);

@@ -4,12 +4,10 @@ const stop = document.querySelector('.stop');
 // stop.disabled = true;
 
 const context = new AudioContext();
-// const analyser = new AnalyserNode(context, { fftSize: 2048 })
 
 const CHANNELS = 1;
 const SAMPLE_RATE = context.sampleRate;
 const CHUNK = 2048;
-// const buffer = context.createBuffer(CHANNELS, CHUNK, SAMPLE_RATE);
 
 console.log(SAMPLE_RATE)
 function getMic() {
@@ -39,7 +37,8 @@ sio.on("Detedted Note", (freq) => {
 });
 
 
-// async because it has to wait for the promise of getMic() to be fulfilled, as getUserMedia retruns a promise of a media stream
+// async because it has to wait for the promise of getMic() to be fulfilled,
+// as getUserMedia retruns a promise of a media stream
 async function setup() {
 	const mic = await getMic();
 	// to resume the context after loading the page because it gets suspended
@@ -48,13 +47,13 @@ async function setup() {
 	}
 	const source = context.createMediaStreamSource(mic);
 
-	context.audioWorklet.addModule("http://127.0.0.1:5000/static/NoteDetectionProcessor.js").then(() => {
-		let noteDetector = new AudioWorkletNode(
+	context.audioWorklet.addModule("http://127.0.0.1:5000/static/AudioStreamProcessor.js").then(() => {
+		let audioStream = new AudioWorkletNode(
 			context,
-			"NoteDetector"
+			"AudioStream"
 		)
 		record.onclick = function () {
-			source.connect(noteDetector);
+			source.connect(audioStream);
 			console.log("recorder started");
 			record.style.background = "red";
 			record.style.color = "black";
@@ -66,9 +65,8 @@ async function setup() {
 			record.style.background = "";
 			record.style.color = "";
 		}
-		noteDetector.port.onmessage = (event) => {
+		audioStream.port.onmessage = (event) => {
 			// Handling data from the processor.
-			// console.log(event.data);
 			sio.emit("data", event.data)
 		};
 	}).catch((e) => { console.log(e) });
