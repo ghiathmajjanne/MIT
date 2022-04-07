@@ -7,7 +7,7 @@ import numpy as np
 
 CHUNK = 2048
 THRESHOLD_WINDOW_SIZE = 11
-THRESHOLD_MULTIPLIER = 10.4
+THRESHOLD_MULTIPLIER = 10.65
 
 DEFAULT_BPM = 120
 DEFAULT_PITCH = 64
@@ -66,8 +66,7 @@ class FrequencyDetector(object):
                     for n in range(self._window_size)])
         self._last_flux.append(flux)
         fluxing = self._get_flux_for_thresholding()
-        thresholded = np.mean(
-            fluxing) * THRESHOLD_MULTIPLIER
+        thresholded = np.mean(fluxing) * THRESHOLD_MULTIPLIER
         prunned = flux - thresholded if thresholded <= flux else 0
         peak = True if prunned > self._last_prunned_flux else False
         self._last_prunned_flux = prunned
@@ -75,7 +74,7 @@ class FrequencyDetector(object):
 
     def _find_fundamental_freq(self, samples):
         """
-        search for maximum between 2000Hz and 70Hz
+        search for maximum between 1200Hz and 70Hz
 
         Retruns:
             Double: the fundemantal frequency fetected 
@@ -114,7 +113,7 @@ class FrequencyDetector(object):
     def _cepstrum(self, samples):
         """
         Calculates the complex cepstrum of a real sequence.
-        A Cepstrum is the inverse fas fourier transform of the log of the signal.
+        A Cepstrum is the inverse fft of the log of the fft the signal.
         We use the cepsrtrum instead of a spectrum because it deals with the harmonic
         frequencies better than the normal spectrum, and musical instruments has a lot of
         harmonic frequencies in their signals.
