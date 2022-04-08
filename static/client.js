@@ -8,6 +8,17 @@ const CHANNELS = 1;
 const SAMPLE_RATE = context.sampleRate;
 const CHUNK = 2048;
 
+let randString = -1;
+let randFret = -1;
+let score = 0;
+let numNotes = 0;
+
+function startGame() {
+	randString = Math.floor(Math.random() * 6);
+	randFret = Math.floor(Math.random() * 12);
+	console.log("Play " + guitarStrings[randString] + randFret);
+}
+
 function getMic() {
 	return navigator.mediaDevices.getUserMedia({
 		audio: true
@@ -33,6 +44,14 @@ sio.on("disconnect", () => {
 sio.on("Detedted Note", (freq) => {
 	console.log("Note detected; fundamental frequency:", freq)
 	//TODO: Added the functionality of the game
+	if (freq < frequencies[randString][randFret] * 1.03 && freq > frequencies[randString][randFret] * 0.97) {
+		score++;
+		console.log("Correct");
+	} else {
+		console.log("Wrong");
+	}
+	numNotes++;
+	startGame();
 });
 
 
@@ -64,16 +83,11 @@ async function setup() {
 			"AudioStream"
 		)
 		start_button.onclick = function () {
+			startGame();
 			source.connect(audioStream);
 			console.log("Stream started");
 			stop_button.disabled = false;
 			start_button.disabled = true;
-			let randString = Math.floor(Math.random() * 6);
-			console.log(randString);
-			let randFret = Math.floor(Math.random() * 12);
-			console.log(randFret);
-			console.log("Play " + guitarStrings[randString] + randFret);
-
 		}
 
 		stop_button.onclick = function () {
@@ -83,6 +97,10 @@ async function setup() {
 			console.log("Stream stopped");
 			start_button.style.background = "";
 			start_button.style.color = "";
+			randString = -1;
+			randFret = -1
+			console.log("***** the Game Ended *****");
+			console.log("Score: " + score + "/" + numNotes);
 		}
 		audioStream.port.onmessage = (event) => {
 			// Handling data from the processor.
@@ -95,10 +113,4 @@ async function setup() {
 
 
 setup()
-
-
-
-
-
-
 
