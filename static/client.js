@@ -1,5 +1,6 @@
-const start_button = document.querySelector('.start');
-const stop_button = document.querySelector('.stop');
+const start_button = document.getElementById("start_btn");
+const stop_button = document.getElementById("stop_btn");
+const note_txtbox = document.getElementById("note_to_play");
 stop_button.disabled = true;
 
 const context = new AudioContext();
@@ -17,6 +18,7 @@ function startGame() {
 	randString = Math.floor(Math.random() * 6);
 	randFret = Math.floor(Math.random() * 12);
 	console.log("Play " + guitarStrings[randString] + randFret);
+	note_txtbox.innerHTML = guitarStrings[randString] + randFret.toString()
 }
 
 function getMic() {
