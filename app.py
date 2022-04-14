@@ -176,7 +176,6 @@ app.config["MYSQL_PASSWORD"] = "root"
 app.config["MYSQL_DB"] = "users"
 
 db = MySQL(app)
-# TODO: Add the mysql file to the repo
 
 
 @app.route("/", methods=["GET", "POST"])
