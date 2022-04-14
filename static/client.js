@@ -45,7 +45,7 @@ sio.on("disconnect", () => {
 
 sio.on("Detedted Note", (freq) => {
 	console.log("Note detected; fundamental frequency:", freq)
-	//TODO: Added the functionality of the game
+	//TODO: Add the feedback to the GUI
 	if (freq < frequencies[randString][randFret] * 1.03 && freq > frequencies[randString][randFret] * 0.97) {
 		score++;
 		console.log("Correct");

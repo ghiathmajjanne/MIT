@@ -1,6 +1,8 @@
 from collections import deque
 import itertools
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory, redirect, url_for, session
+from flask_mysqldb import MySQL
+import MySQLdb
 from flask_socketio import SocketIO, emit
 import numpy as np
 
@@ -164,17 +166,78 @@ freq_Detector = FrequencyDetector(window_size=CHUNK,
 app = Flask(__name__)
 socket = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*")
 
+app.secret_key = ""
 
-@app.route('/')
+app.secret_key = "1234567890"
+
+app.config["MYSQL_HOST"] = "localhost"
+app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_PASSWORD"] = "root"
+app.config["MYSQL_DB"] = "users"
+
+db = MySQL(app)
+# TODO: Add the mysql file to the repo
+
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        if "username" in request.form and "password" in request.form:
+            username = request.form["username"]
+            password = request.form["password"]
+            cursor = db.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+                "SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
+            info = cursor.fetchone()
+            if info is not None:
+                if info["username"] == username and info["password"] == password:
+                    session["loginSuccessful"] = True
+                    return redirect(url_for("index"))
+            else:
+                return redirect(url_for("login"))
+
+    return render_template("login.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def create_new_user():
+    if request.method == "POST":
+        if "username" in request.form and "password" in request.form and "re_password" in request.form:
+            username = request.form["username"]
+            password = request.form["password"]
+            re_password = request.form["re_password"]
+            if (password != re_password):
+                return "Passwords Don't match"
+            check_username = db.connection.cursor(MySQLdb.cursors.DictCursor)
+
+            check_username.execute(
+                "SELECT * FROM users WHERE username=%s", [username])
+            info = check_username.fetchone()
+            if info is not None:
+                if info["username"] == username:
+                    return "Username already exists"
+
+            cursor = db.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+                "INSERT INTO users.users(username, password)VALUES(%s, %s)", (username, password))
+
+            db.connection.commit()
+            return redirect(url_for("login"))
+    return render_template("register.html")
+
+
+@app.route("/index")
 def index():
-    print("sending index.html")
-    return render_template('index.html')
+    if session["loginSuccessful"] == True:
+        print("sending index.html")
+        return render_template("index.html")
+    return render_template("index.html")
 
 
-@app.route("/static/AudioStreamProcessor.js", methods=['GET'])
+@app.route("/static/AudioStreamProcessor.js", methods=["GET"])
 def static_dir():
     response = send_from_directory("static", "AudioStreamProcessor.js")
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
