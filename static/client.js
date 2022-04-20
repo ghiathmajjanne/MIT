@@ -1,6 +1,7 @@
 const start_button = document.getElementById("start_btn");
 const stop_button = document.getElementById("stop_btn");
 const note_txtbox = document.getElementById("note_to_play");
+const note_card = document.getElementById("note_card");
 stop_button.disabled = true;
 
 const context = new AudioContext();
@@ -45,16 +46,25 @@ sio.on("disconnect", () => {
 
 sio.on("Detedted Note", (freq) => {
 	console.log("Note detected; fundamental frequency:", freq)
-	//TODO: Add the feedback to the GUI
 	if (freq < frequencies[randString][randFret] * 1.03 && freq > frequencies[randString][randFret] * 0.97) {
 		score++;
 		console.log("Correct");
+		note_card.style.background = "rgb(110, 220, 20)";
+		window.setTimeout(reset_note_card, 300);
 	} else {
 		console.log("Wrong");
+		note_card.style.background = "rgb(216, 70, 40)";
+		window.setTimeout(reset_note_card, 300);
 	}
 	numNotes++;
 	startGame();
 });
+
+
+// resets the background color of the note card to white
+function reset_note_card() {
+	note_card.style.background = "white";
+}
 
 
 // covers all strings of the guitar with 11 frets each
@@ -84,6 +94,7 @@ async function setup() {
 			context,
 			"AudioStream"
 		)
+
 		start_button.onclick = function () {
 			startGame();
 			source.connect(audioStream);
@@ -93,6 +104,7 @@ async function setup() {
 		}
 
 		stop_button.onclick = function () {
+			//TODO: Display score to the user
 			source.disconnect();
 			stop_button.disabled = true;
 			start_button.disabled = false;
@@ -100,10 +112,12 @@ async function setup() {
 			start_button.style.background = "";
 			start_button.style.color = "";
 			randString = -1;
-			randFret = -1
+			randFret = -1;
+			note_txtbox.innerHTML = "";
 			console.log("***** the Game Ended *****");
 			console.log("Score: " + score + "/" + numNotes);
 		}
+
 		audioStream.port.onmessage = (event) => {
 			// Handling data from the processor.
 			sio.emit("data", event.data)
