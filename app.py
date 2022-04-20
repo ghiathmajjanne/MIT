@@ -10,11 +10,6 @@ import numpy as np
 CHUNK = 2048
 THRESHOLD_WINDOW_SIZE = 11
 THRESHOLD_MULTIPLIER = 10.65
-
-DEFAULT_BPM = 120
-DEFAULT_PITCH = 64
-DEFAULT_VELOCITY = 64
-
 RING_BUFFER_SIZE = 70
 SAMPLE_RATE = 48000
 
@@ -100,9 +95,13 @@ class FrequencyDetector(object):
 
     def _autopower_spectrum(self, samples):
         """
-        Calculates a power spectrum of the given data using the Hamming window.
-        why we use autopower spectrum and not a normal spectum:
-        https://community.sw.siemens.com/s/article/spectrum-versus-autopower
+        Calculates a power spectrum of the given data using the Hanning window.
+
+        Parameters:
+            samples (float[2048]): an array of size 2048
+
+        Retruns:
+            autopower spectrum
         """
         windowed = samples * self._hanning_window
         # Add 0s to double the length of the data
@@ -165,8 +164,6 @@ freq_Detector = FrequencyDetector(window_size=CHUNK,
 
 app = Flask(__name__)
 socket = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*")
-
-app.secret_key = ""
 
 app.secret_key = "1234567890"
 
