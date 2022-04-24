@@ -6,21 +6,11 @@ const score_modal = document.getElementById("score_text");
 
 const context = new AudioContext();
 
-const CHANNELS = 1;
-const SAMPLE_RATE = context.sampleRate;
-const CHUNK = 2048;
-
 let randString = -1;
 let randFret = -1;
 let score = 0;
 let numNotes = 0;
 
-function startGame() {
-	randString = Math.floor(Math.random() * 6);
-	randFret = Math.floor(Math.random() * 12);
-	console.log("Play " + guitarStrings[randString] + randFret);
-	note_txtbox.innerHTML = guitarStrings[randString] + randFret.toString()
-}
 
 function getMic() {
 	return navigator.mediaDevices.getUserMedia({
@@ -43,6 +33,15 @@ sio.on("connect", () => {
 sio.on("disconnect", () => {
 	console.log("disconnected from the server")
 });
+
+
+// generates a randome note and displayes it to the screen
+function startGame() {
+	randString = Math.floor(Math.random() * 6);
+	randFret = Math.floor(Math.random() * 12);
+	console.log("Play " + guitarStrings[randString] + randFret);
+	note_txtbox.innerHTML = guitarStrings[randString] + randFret.toString()
+}
 
 sio.on("Detedted Note", (freq) => {
 	console.log("Note detected; fundamental frequency:", freq)
@@ -77,6 +76,7 @@ const frequencies = [
 	[82, 87, 92, 98, 104, 110, 117, 123, 131, 139, 147, 156]
 ];
 
+// names of the 6 guitar strings
 const guitarStrings = ["e", "B", "G", "D", "A", "E"];
 
 // async because it has to wait for the promise of getMic() to be fulfilled,
@@ -108,8 +108,6 @@ async function setup() {
 			stop_button.disabled = true;
 			start_button.disabled = false;
 			console.log("Stream stopped");
-			start_button.style.background = "";
-			start_button.style.color = "";
 			randString = -1;
 			randFret = -1;
 			note_txtbox.innerHTML = "";
@@ -125,8 +123,6 @@ async function setup() {
 			sio.emit("data", event.data)
 		};
 	}).catch((e) => { console.log(e) });
-
-
 }
 
 setup()
