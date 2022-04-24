@@ -2,7 +2,7 @@ const start_button = document.getElementById("start_btn");
 const stop_button = document.getElementById("stop_btn");
 const note_txtbox = document.getElementById("note_to_play");
 const note_card = document.getElementById("note_card");
-stop_button.disabled = true;
+const score_modal = document.getElementById("score_text");
 
 const context = new AudioContext();
 
@@ -104,7 +104,6 @@ async function setup() {
 		}
 
 		stop_button.onclick = function () {
-			//TODO: Display score to the user
 			source.disconnect();
 			stop_button.disabled = true;
 			start_button.disabled = false;
@@ -116,6 +115,9 @@ async function setup() {
 			note_txtbox.innerHTML = "";
 			console.log("***** the Game Ended *****");
 			console.log("Score: " + score + "/" + numNotes);
+			score_modal.innerHTML = "Score: " + score + "/" + numNotes;
+			score = 0;
+			numNotes = 0;
 		}
 
 		audioStream.port.onmessage = (event) => {
@@ -127,6 +129,4 @@ async function setup() {
 
 }
 
-
 setup()
-
