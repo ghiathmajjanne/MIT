@@ -152,7 +152,6 @@ class FrequencyDetector(object):
 
         if onset:
             freq = self._find_fundamental_freq(data)
-            print("Note detected; fundamental frequency: ", freq)
             return freq
 
 # end of the FrequencyDetector Class
@@ -192,7 +191,7 @@ def login():
                     session["loginSuccessful"] = True
                     return redirect(url_for("index"))
             else:
-                return redirect(url_for("login"))
+                return "Incorrect username or password"
 
     return render_template("login.html")
 
